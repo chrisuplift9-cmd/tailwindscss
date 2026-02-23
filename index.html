@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Money🤑Vault — Global Money Movement</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Modern White & Cyan Background */
+    body {
+      overflow-x: hidden;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 30%, #e0f7ff 60%, #ffffff 100%);
+      color: #1a2f4a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      position: relative;
+      font-weight: 500;
+    }
+
+    /* Animated Floating Orbs Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(34, 211, 238, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+      animation: orb-float 20s ease-in-out infinite;
+    }
+
+    @keyframes orb-float {
+      0%, 100% {
+        background: 
+          radial-gradient(circle at 10% 20%, rgba(34, 211, 238, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 90% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+      }
+      50% {
+        background: 
+          radial-gradient(circle at 20% 40%, rgba(34, 211, 238, 0.2) 0%, transparent 50%),
+          radial-gradient(circle at 80% 60%, rgba(34, 211, 238, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 60% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+      }
+    }
+
+    /* Floating Particle Animation */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 1px 1px, rgba(34, 211, 238, 0.08) 1px, transparent 1px),
+        radial-gradient(circle at 40px 60px, rgba(34, 211, 238, 0.06) 1px, transparent 1px),
+        radial-gradient(circle at 90px 10px, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
+      background-size: 100px 100px, 200px 150px, 250px 200px;
+      animation: particle-drift 15s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes particle-drift {
+      0% {
+        background-position: 0 0, 0 0, 0 0;
+      }
+      100% {
+        background-position: 100px 0, 200px 0, 250px 0;
+      }
+    }
+
+    /* Modern Glass Container */
+    .glass {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 2px solid rgba(34, 211, 238, 0.3);
+      box-shadow: 
+        0 20px 60px rgba(34, 211, 238, 0.15),
+        inset 0 0 30px rgba(255, 255, 255, 0.7),
+        0 0 80px rgba(34, 211, 238, 0.1);
+      border-radius: 30px;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 10;
+    }
+
+    .glass:hover {
+      border-color: rgba(34, 211, 238, 0.5);
+      box-shadow: 
+        0 25px 80px rgba(34, 211, 238, 0.25),
+        inset 0 0 40px rgba(255, 255, 255, 0.8),
+        0 0 100px rgba(34, 211, 238, 0.15);
+      transform: translateY(-5px);
+    }
+
+    /* Cyan Glow Button */
+    .neon-btn {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      color: white;
+      border: 2px solid rgba(34, 211, 238, 0.4);
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      box-shadow: 
+        0 10px 30px rgba(34, 211, 238, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 0.95rem;
+      padding: 16px 32px;
+      border-radius: 14px;
+    }
+
+    .neon-btn::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: rotate(45deg);
+      animation: button-shine 3s infinite;
+    }
+
+    @keyframes button-shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .neon-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+      box-shadow: 
+        0 15px 50px rgba(34, 211, 238, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 30px rgba(34, 211, 238, 0.4);
+    }
+
+    .neon-btn:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    .neon-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Modern Input Fields */
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 249, 255, 0.8) 100%);
+      border: 2px solid rgba(34, 211, 238, 0.2);
+      color: #1a2f4a;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(34, 211, 238, 0.08);
+      font-weight: 500;
+    }
+
+    input::placeholder {
+      color: rgba(26, 47, 74, 0.5);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(34, 211, 238, 0.6);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(224, 247, 255, 0.9) 100%);
+      box-shadow: 
+        0 4px 15px rgba(34, 211, 238, 0.08),
+        0 0 30px rgba(34, 211, 238, 0.2),
+        inset 0 0 20px rgba(34, 211, 238, 0.05);
+      transform: translateY(-2px);
+    }
+
+    /* Text Gradient */
+    .text-gradient {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    /* Emoji Glow */
+    .emoji-glow {
+      display: inline-block;
+      font-size: 1.3em;
+      text-shadow: 
+        0 0 15px rgba(34, 211, 238, 0.6),
+        0 0 30px rgba(34, 211, 238, 0.3);
+      animation: emoji-bounce 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes emoji-bounce {
+      0%, 100% { 
+        transform: translateY(0) scale(1);
+      }
+      50% { 
+        transform: translateY(-8px) scale(1.1);
+        filter: drop-shadow(0 8px 15px rgba(34, 211, 238, 0.3));
+      }
+    }
+
+    /* Auth Overlay */
+    #auth-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      animation: overlay-fade 0.6s ease;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    @keyframes overlay-fade {
+      from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+      }
+      to {
+        opacity: 1;
+        backdrop-filter: blur(10px);
+      }
+    }
+
+    /* Auth Container */
+    .auth-container {
+      width: 100%;
+      max-width: 480px;
+      padding: 60px 50px;
+      animation: form-slide-up 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      margin: auto;
+    }
+
+    @keyframes form-slide-up {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Form Title */
+    #form-title {
+      font-size: 2.8rem;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 40px;
+      letter-spacing: -2px;
+      color: #1a2f4a;
+    }
+
+    /* User Info Section */
+    .user-info {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(34, 211, 238, 0.05) 100%);
+      border: 2px solid rgba(34, 211, 238, 0.3);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 35px;
+      text-align: center;
+      animation: info-fade-in 0.8s ease;
+    }
+
+    @keyframes info-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .user-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #06b6d4;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #1a2f4a;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .contact-item:hover {
+      color: #06b6d4;
+      transform: translateY(-2px);
+    }
+
+    .contact-item a {
+      color: #06b6d4;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: 700;
+    }
+
+    .contact-item a:hover {
+      color: #0891b2;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .whatsapp-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #25d366 0%, #1fb043 100%);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .whatsapp-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(37, 211, 102, 0.5);
+      background: linear-gradient(135deg, #1fb043 0%, #128c47 100%);
+    }
+
+    /* Form */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Form Group */
+    .form-group {
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #1a2f4a;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    /* Services/Payment Section */
+    .services-section {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.08) 0%, rgba(34, 211, 238, 0.04) 100%);
+      border: 2px solid rgba(34, 211, 238, 0.2);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 25px;
+    }
+
+    .services-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #06b6d4;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .service-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .service-card {
+      background: white;
+      border: 2px solid rgba(34, 211, 238, 0.2);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .service-card:hover {
+      border-color: rgba(34, 211, 238, 0.5);
+      box-shadow: 0 8px 25px rgba(34, 211, 238, 0.15);
+      transform: translateY(-3px);
+    }
+
+    .service-card.selected {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.2) 0%, rgba(34, 211, 238, 0.1) 100%);
+      border-color: #06b6d4;
+      box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
+    }
+
+    .service-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .service-name {
+      font-weight: 700;
+      color: #1a2f4a;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .service-price {
+      color: #06b6d4;
+      font-weight: 800;
+      font-size: 1.3rem;
+    }
+
+    /* Alert Messages */
+    .alert {
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .alert.success {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+      border: 2px solid #22c55e;
+      color: #15803d;
+      display: block;
+    }
+
+    .alert.error {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+      border: 2px solid #ef4444;
+      color: #991b1b;
+      display: block;
+    }
+
+    .alert.info {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(34, 211, 238, 0.05) 100%);
+      border: 2px solid #06b6d4;
+      color: #0c4a6e;
+      display: block;
+    }
+
+    /* Tab Navigation */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+      border-bottom: 2px solid rgba(34, 211, 238, 0.2);
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      color: #1a2f4a;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn.active {
+      color: #06b6d4;
+      border-bottom-color: #06b6d4;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fade-in 0.3s ease;
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .auth-container {
+        padding: 50px 35px;
+        max-width: 95%;
+      }
+
+      #form-title {
+        font-size: 2.2rem;
+        margin-bottom: 30px;
+      }
+
+      .service-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .auth-container {
+        padding: 40px 22px;
+      }
+
+      #form-title {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+      }
+
+      input[type="email"],
+      input[type="password"],
+      input[type="text"],
+      input[type="number"],
+      select {
+        padding: 14px 16px;
+        font-size: 16px;
+      }
+
+      .neon-btn {
+        padding: 14px;
+      }
+
+      .user-info {
+        padding: 18px;
+        margin-bottom: 25px;
+      }
+
+      .user-name {
+        font-size: 1.1rem;
+      }
+
+      .tabs {
+        gap: 5px;
+      }
+
+      .tab-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login / Register / Payment Overlay -->
+  <div id="auth-overlay">
+    <div class="glass auth-container">
+      <h2 id="form-title" class="text-gradient">
+        Money<span class="emoji-glow">🤑</span>Vault
+      </h2>
+
+      <!-- User Info Card -->
+      <div class="user-info">
+        <div class="user-name">
+          <i class="fas fa-user-circle" style="margin-right: 8px; color: #06b6d4;"></i>
+          Chris Appiah
+        </div>
+        <div class="contact-info">
+          <div class="contact-item">
+            <i class="fas fa-phone" style="color: #06b6d4;"></i>
+            <span>+233 533 926 683</span>
+          </div>
+          <a href="https://wa.me/233533926683?text=Hello%20Chris%20from%20MoneyVault" class="whatsapp-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            Message on WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="auth">Account</button>
+        <button class="tab-btn" data-tab="payment">Services & Payment</button>
+      </div>
+
+      <!-- Auth Forms Tab -->
+      <div id="auth" class="tab-content active">
+        <!-- Login Form -->
+        <form id="login-form">
+          <div class="form-group">
+            <input type="email" placeholder="Enter your email address" required/>
+          </div>
+
+          <div class="form-group">
+            <input type="password" placeholder="Enter your password" required/>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+            <label style="display: flex; align-items: center; gap: 8px; color: #1a2f4a; font-weight: 500; cursor: pointer;">
+              <input type="checkbox"/>
+              Remember me
+            </label>
+            <button type="button" id="forgot-password" style="color: #06b6d4; background: none; border: none; cursor: pointer; font-weight: 600; text-decoration: underline;">
+              Forgot Password?
+            </button>
+          </div>
+
+          <button type="submit" class="neon-btn">
+            <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> Log In to Vault
+          </button>
+
+          <p style="text-align: center; font-size: 0.95rem; color: rgba(26, 47, 74, 0.8); font-weight: 500;">
+            Don't have an account? <button type="button" id="switch-to-register" style="color: #06b6d4; background: none; border: none; cursor: pointer; font-weight: 600; text-decoration: underline;">Sign up here</button>
+          </p>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="hidden">
+          <div class="form-group">
+            <input type="text" placeholder="Your full name" required/>
+          </div>
+
+          <div class="form-group">
+            <input type="email" placeholder="Email address" required/>
+          </div>
+
+          <div class="form-group">
+            <input type="password" placeholder="Create a strong password" required/>
+          </div>
+
+          <div style="display: flex; align-items: flex-start; gap: 14px; padding: 18px 20px; background: linear-gradient(135deg, rgba(34, 211, 238, 0.08) 0%, rgba(34, 211, 238, 0.04) 100%); border-radius: 14px; border: 2px solid rgba(34, 211, 238, 0.2); transition: all 0.4s ease;">
+            <input type="checkbox" id="biometrics" style="width: 22px; height: 22px; accent-color: #06b6d4; cursor: pointer;"/>
+            <label for="biometrics" style="margin: 0; cursor: pointer; display: flex; flex-direction: column; gap: 6px; flex: 1; color: #1a2f4a;">
+              <span style="font-weight: 700;">Enable Biometric Authentication <span class="emoji-glow">🖐️</span></span>
+              <span style="font-size: 0.8rem; color: rgba(26, 47, 74, 0.6); font-weight: 400;">Secure login with Face ID or Fingerprint</span>
+            </label>
+          </div>
+
+          <button type="submit" class="neon-btn">
+            <i class="fas fa-user-plus" style="margin-right: 8px;"></i> Create Account
+          </button>
+
+          <p style="text-align: center; font-size: 0.95rem; color: rgba(26, 47, 74, 0.8); font-weight: 500;">
+            Already have an account? <button type="button" id="switch-to-login" style="color: #06b6d4; background: none; border: none; cursor: pointer; font-weight: 600; text-decoration: underline;">Log in here</button>
+          </p>
+        </form>
+      </div>
+
+      <!-- Payment Tab -->
+      <div id="payment" class="tab-content">
+        <div class="alert info">
+          <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+          Choose a service below and proceed with payment
+        </div>
+
+        <form id="payment-form">
+          <!-- Services Section -->
+          <div class="services-section">
+            <div class="services-title">📊 Choose Your Service</div>
+            
+            <div class="service-cards">
+              <div class="service-card" data-price="50" data-name="Financial Consultation">
+                <div class="service-icon">💼</div>
+                <div class="service-name">Consultation</div>
+                <div class="service-price">GHS 50</div>
+                <div style="font-size: 0.8rem; color: rgba(26, 47, 74, 0.6); margin-top: 8px;">30 min session</div>
+              </div>
+
+              <div class="service-card" data-price="100" data-name="Budget Planning">
+                <div class="service-icon">📈</div>
+                <div class="service-name">Budget Plan</div>
+                <div class="service-price">GHS 100</div>
+                <div style="font-size: 0.8rem; color: rgba(26, 47, 74, 0.6); margin-top: 8px;">Full planning</div>
+              </div>
+
+              <div class="service-card" data-price="75" data-name="Investment Guide">
+                <div class="service-icon">🎯</div>
+                <div class="service-name">Investment</div>
+                <div class="service-price">GHS 75</div>
+                <div style="font-size: 0.8rem; color: rgba(26, 47, 74, 0.6); margin-top: 8px;">Strategy guide</div>
+              </div>
+
+              <div class="service-card" data-price="150" data-name="Premium Package">
+                <div class="service-icon">⭐</div>
+                <div class="service-name">Premium</div>
+                <div class="service-price">GHS 150</div>
+                <div style="font-size: 0.8rem; color: rgba(26, 47, 74, 0.6); margin-top: 8px;">3 months access</div>
+              </div>
+            </div>
+
+            <div style="background: white; border: 2px solid rgba(34, 211, 238, 0.2); border-radius: 12px; padding: 18px; text-align: center;">
+              <div style="font-size: 0.9rem; color: rgba(26, 47, 74, 0.7); margin-bottom: 8px;">Selected Service</div>
+              <div id="selected-service" style="font-weight: 700; color: #06b6d4; font-size: 1.1rem;">Please select a service</div>
+              <div id="selected-price" style="font-weight: 800; color: #06b6d4; font-size: 1.8rem; margin-top: 4px;">GHS 0</div>
+            </div>
+          </div>
+
+          <!-- Payment Details -->
+          <div style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.08) 0%, rgba(34, 211, 238, 0.04) 100%); border: 2px solid rgba(34, 211, 238, 0.2); border-radius: 16px; padding: 28px; margin-bottom: 25px;">
+            <div style="font-size: 1.2rem; font-weight: 700; color: #06b6d4; margin-bottom: 20px;">💳 Payment Details</div>
+
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" id="customer-name" placeholder="Chris Appiah" required/>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="customer-email" placeholder="your@email.com" required/>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="text" id="customer-phone" placeholder="+233 533 926 683" required/>
+            </div>
+          </div>
+
+          <!-- Alert Messages -->
+          <div id="payment-alert" class="alert"></div>
+
+          <!-- Payment Button -->
+          <button type="submit" class="neon-btn" id="submit-btn" style="width: 100%;">
+            <i class="fas fa-lock" style="margin-right: 8px;"></i> Complete Payment
+          </button>
+
+          <p style="text-align: center; font-size: 0.85rem; color: rgba(26, 47, 74, 0.6); margin-top: 16px;">
+            <i class="fas fa-shield-alt" style="margin-right: 4px;"></i>
+            Your payment information is secure
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============= TAB NAVIGATION =============
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabName = btn.getAttribute('data-tab');
+        
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(tabName).classList.add('active');
+      });
+    });
+
+    // ============= FORM SWITCHING =============
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const formTitle = document.getElementById('form-title');
+    const switchToRegister = document.getElementById('switch-to-register');
+    const switchToLogin = document.getElementById('switch-to-login');
+
+    switchToRegister.addEventListener('click', (e) => {
+      e.preventDefault();
+      loginForm.classList.add('hidden');
+      registerForm.classList.remove('hidden');
+      formTitle.textContent = 'Create Account';
+    });
+
+    switchToLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      registerForm.classList.add('hidden');
+      loginForm.classList.remove('hidden');
+      formTitle.innerHTML = 'Money<span class="emoji-glow">🤑</span>Vault';
+    });
+
+    // ============= FORM SUBMISSIONS =============
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('✅ Login feature coming soon! For now, use the Services tab to make payments.');
+    });
+
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('✅ Registration feature coming soon! For now, use the Services tab to make payments.');
+    });
+
+    document.getElementById('forgot-password').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Password recovery coming soon! Contact Chris on WhatsApp.');
+    });
+
+    // ============= SERVICE SELECTION =============
+    const serviceCards = document.querySelectorAll('.service-card');
+    let selectedService = null;
+    let selectedPrice = 0;
+
+    serviceCards.forEach(card => {
+      card.addEventListener('click', () => {
+        serviceCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        
+        selectedService = card.getAttribute('data-name');
+        selectedPrice = parseInt(card.getAttribute('data-price'));
+        
+        document.getElementById('selected-service').textContent = selectedService;
+        document.getElementById('selected-price').textContent = `GHS ${selectedPrice}`;
+      });
+    });
+
+    // ============= PAYMENT FORM SUBMISSION =============
+    document.getElementById('payment-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!selectedService) {
+        showAlert('Please select a service first!', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submit-btn');
+      const customerName = document.getElementById('customer-name').value;
+      const customerEmail = document.getElementById('customer-email').value;
+      const customerPhone = document.getElementById('customer-phone').value;
+
+      if (!customerName || !customerEmail || !customerPhone) {
+        showAlert('Please fill in all payment details!', 'error');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Payment...';
+
+      try {
+        // Simulate payment processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        showAlert(`✅ Payment Successful! ${selectedService} has been purchased. Check your email for receipt. Thank you!`, 'success');
+        
+        document.getElementById('payment-form').reset();
+        selectedService = null;
+        selectedPrice = 0;
+        document.getElementById('selected-service').textContent = 'Please select a service';
+        document.getElementById('selected-price').textContent = 'GHS 0';
+        
+        serviceCards.forEach(c => c.classList.remove('selected'));
+      } catch (error) {
+        showAlert('Payment error: ' + error.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Payment';
+      }
+    });
+
+    // ============= ALERT HELPER =============
+    function showAlert(message, type) {
+      const alert = document.getElementById('payment-alert');
+      alert.textContent = message;
+      alert.className = `alert ${type}`;
+      
+      setTimeout(() => {
+        alert.className = 'alert';
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
